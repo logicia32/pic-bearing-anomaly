@@ -1,0 +1,20 @@
+# gpsim startup script: load hex, run to break, dump state
+load s mahal.cod
+processor pic16f1503
+# break at the 'loop' label after main → mah_evaluate returns
+break e loop
+run
+echo === cycles since reset ===
+.sim "cycles"
+echo === acc (LSB..MSB) and result ===
+x acc0
+x acc1
+x acc2
+x acc3
+x result
+echo === dx, dy ===
+x dx_lo
+x dx_hi
+x dy_lo
+x dy_hi
+quit

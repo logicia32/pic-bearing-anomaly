@@ -1,0 +1,38 @@
+{
+  "eps": 2e-05,
+  "qmodel": {
+    "frac_x": 14,
+    "mu_x_q": 2276,
+    "mu_y_q": 2320,
+    "frac_k": 0,
+    "k_a": 26188,
+    "k_b": 23062,
+    "k_c": 26081,
+    "output_shift": 0
+  },
+  "info": {
+    "eps": 2e-05,
+    "regularized": true,
+    "s_xx_used": 0.000173250733283866,
+    "s_xy_used": 0.00015257024449296625,
+    "s_yy_used": 0.00017254401345910293,
+    "det_used": 6.61569735088733e-09,
+    "frac_x": 14,
+    "frac_k": 0,
+    "k_a_unscaled": 26187.826331056207,
+    "k_b_unscaled": 23061.853709571944,
+    "k_c_unscaled": 26081.001640131024
+  },
+  "error": {
+    "max_abs_err": 14921.663286765315,
+    "max_rel_err": 0.9369392887494801,
+    "mean_abs_err": 13.987610243017851,
+    "n_samples": 2156
+  },
+  "threshold_ref": 50.0,
+  "agree_pct": 98.93320964749536,
+  "miss": 23,
+  "false_pos": 0,
+  "first_anomaly_ref": 1863,
+  "first_anomaly_pic": 2125
+}

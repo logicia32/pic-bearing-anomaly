@@ -1,0 +1,24 @@
+# 生成ファイル (gpasm)
+*.hex
+*.lst
+*.cod
+*.o
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# NASA データ本体 (1 GB 級、再配布不可)
+ims-bearings.zip
+IMS.7z
+1st_test.rar
+2nd_test.rar
+3rd_test.rar
+ims-readme.pdf
+data/
+
+# OS
+.DS_Store
+Thumbs.db

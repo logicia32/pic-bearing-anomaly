@@ -1,0 +1,19 @@
+{
+  "T_q": 11898,
+  "T_phys": 2.90478515625,
+  "windows": 2156,
+  "acc_range": [
+    -16917,
+    5083318
+  ],
+  "agree_pct": 77.4582560296846,
+  "miss": 486,
+  "false_pos": 0,
+  "first_anomaly_B": 214,
+  "first_anomaly_asm": 246,
+  "err_vs_B": {
+    "max_abs": 10.689113093536278,
+    "mean_abs": 4.083157151964115,
+    "max_rel_pct": 282.9986398316025
+  }
+}
