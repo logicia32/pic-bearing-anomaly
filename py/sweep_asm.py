@@ -2,7 +2,7 @@
 
 asm strategy:
   acc = k_c * (dx²>>16) + k_a * (dy²>>16) - k_b * ((2*dx*dy)>>16)   (32-bit signed)
-  anomaly := acc > T_q (= 11898)
+  anomaly := acc >= T_q (= 11898)   ; asm の subwf+btfsc(C) と一致
   → これは d²_physical * 2^12 のスケール。
 
 比較対象: regularized float d² (ε=2e-5)、と元データ d²_ref。
@@ -74,8 +74,8 @@ def main():
     acc = np.array([asm_d2(int(x), int(y)) for x, y in zip(in_x_q, in_y_q)])
     print(f"asm acc range: [{acc.min()}, {acc.max()}]")
 
-    # 異常判定 (asm)
-    anomaly_asm = acc > T_Q
+    # 異常判定 (asm: subwf+btfsc(C) は acc >= T_Q を見る)
+    anomaly_asm = acc >= T_Q
 
     # 正則化リファレンスの d² と比較 (diagnose.py で出した B 系列に相当する判定)
     # B 系列はそこには npz 保存されていない。再計算する。

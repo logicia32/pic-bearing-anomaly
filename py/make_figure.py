@@ -95,7 +95,7 @@ def main():
         ax1.axvspan(ts[first_asm], ts[-1], alpha=0.07, color="#d62728")
         warn_days = (ts[-1] - ts[first_asm]) / np.timedelta64(1, "D")
         ax1.text(ts[first_asm] + np.timedelta64(1,"D"), 0.50,
-                 f"← ここで検出\n  (catastrophic failure まで {warn_days:.0f} 日)",
+                 f"← 最初に閾値を超えた点\n  (実験終了まで残り {warn_days:.0f} 日)",
                  fontsize=9.5, color="#d62728", va="top")
     ax2.set_yscale("log")
     ax2.set_ylim(0.05, 1500)
