@@ -1,3 +1,98 @@
+# pic-bearing-anomaly — 2D Mahalanobis-distance bearing anomaly detection on a dollar 8-bit PIC
+
+**English** | [日本語](#日本語)
+
+> An attempt to run **2D Mahalanobis-distance** anomaly detection against NASA IMS Bearing run-to-failure data on a **PIC16F1503** (14-pin DIP / 8-bit enhanced mid-range / 128 B SRAM / 2K words flash / **no hardware multiplier**). Not deployed on real silicon — verified for behavior and cycle count on gpsim.
+
+Write-ups:
+**English** → https://logicia32.hashnode.dev/mahalanobis-bearing-anomaly-8bit-pic ·
+**日本語** → https://zenn.dev/logicia32/articles/2026-05-29-pic-mahalanobis-bearing
+
+> Note: the source-code comments are in Japanese. The code itself is plain Python / PIC assembly, so it reads fine either way; only the prose comments are untranslated.
+
+---
+
+## Structure
+
+```
+asm/
+  mahal.asm           d² evaluation routine for the PIC16F1503 (for gpasm)
+  run_gpsim.stc       gpsim startup script
+py/
+  extract.py          stage the NASA zip (whose payload is a 7z)
+  extract_set1.py     extract 1st_test.rar from inside the 7z
+  load_ims.py         scan and read the Set 1 file series
+  mahalanobis_ref.py  numpy reference for the 2D Mahalanobis distance
+  mahalanobis_q.py    Q-format fixed-point version + ε-regularization search
+  diagnose.py         separate the regularization effect from the quantization error
+  verify_asm.py       confirm the gpsim output is bit-exact with Python
+  sweep_asm.py        run the asm semantics over all 2156 windows, compare against the B reference
+  sweep_strategies.py compare the >>16 / rounding / >>12 / 48-bit-acc strategies
+  make_figure.py      plot RMS / d² / detection point
+results/
+  bearing3_*.json     model coefficients / diagnostic summaries
+  bearing3_features.npz  Bearing 3 (RMS_x, RMS_y) and d² (2156 windows)
+figures/
+  bearing3_detection.png
+```
+
+## Getting the source data
+
+This uses the **IMS Bearing Data** (provided by the University of Cincinnati), distributed by the [NASA Prognostics Center of Excellence — Bearings](https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/). The data itself is **not** included in this repo (for both license and size reasons).
+
+Direct link (NASA PCoE mirror / S3):
+- https://phm-datasets.s3.amazonaws.com/NASA/4.+Bearings.zip  (~1.0 GB)
+
+The zip's payload is `IMS.7z` (which nests three sets of RAR). `py/extract.py` and `py/extract_set1.py` peel it, in order, from zip → 7z → RAR → `data/1st_test/`. Extracting the RAR needs [unrar](https://www.rarlab.com/).
+
+## Running (rough steps)
+
+```bash
+# 1. Build the numeric reference (assuming the NASA data is in place)
+python py/extract.py          # zip -> IMS.7z
+python py/extract_set1.py     # 7z  -> data/1st_test/
+python py/mahalanobis_ref.py  # 2156-window features -> numpy training -> results/
+
+# 2. Work out the Q-format / quantization
+python py/mahalanobis_q.py    # epsilon sweep, fit the coefficients into 16-bit
+python py/diagnose.py         # separate regularization effect from quantization error
+python py/sweep_strategies.py # compare >>16 / rounding / >>12 / 48-bit
+
+# 3. Assemble the PIC asm
+gpasm -p 16F1503 -I <header_path> -o asm/mahal.hex asm/mahal.asm
+
+# 4. Verify behavior and cycle count in gpsim
+gpsim -p p16f1503 < asm/run_gpsim.stc
+
+# 5. Run the asm semantics over all 2156 windows
+python py/sweep_asm.py
+
+# 6. Plot the figure
+python py/make_figure.py
+```
+
+## Key numbers (measured)
+
+- Per d² evaluation: **2,793 cycles** (measured in gpsim) ≈ 349 μs @ 8 MIPS
+- Program Memory: **230 / 2,048 words (11%)**
+- SRAM: **~27 / 128 bytes (21%)**
+- Anomaly decision over all 2,156 windows: agreement between the PIC equivalent (32-bit acc / >>16) and the regularized reference is **77.46%**, with FP **0**
+- Extending the 32-bit acc to 48-bit raises the agreement to **99.72%**, with a detection delay of **0 windows**
+
+## Dependencies
+
+- Python 3.10+ / numpy, scipy, matplotlib, py7zr
+- gpasm / gpsim (verified with gputils 1.4.0, gpsim 0.32.1)
+- unrar (to peel the RAR inside NASA's `IMS.7z`)
+
+## License
+
+[MIT](LICENSE). Copyright K. NISHIMURA.
+
+---
+
+## 日本語
+
 # pic-bearing-anomaly
 
 NASA IMS Bearing run-to-failure データに対して、**2D マハラノビス距離**で異常検知する処理を、
